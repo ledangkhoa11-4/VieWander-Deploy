@@ -1,5 +1,6 @@
 import express from 'express'
 import axios from 'axios';
+import provinceModel from '../model/provincesSchema.js';
 const Router = express.Router();
 const mapQuestKey = `3DwwGLfhu0C1GkRoefLzhcTJ5VK8pAyH`
 Router.get("/", async (req, res) => {
@@ -31,13 +32,14 @@ Router.get("/", async (req, res) => {
       let cityName = city.locations[0].adminArea4
       if (city.locations[0].adminArea1 != "VN")
         continue
+      const province_id = await provinceModel.findOne({name: cityName}).exec()  
       if (!cityRoute.has(JSON.stringify({
-        _id: "abcd",
+        _id: province_id._id,
         label: cityName,
         image: "image"
       })))
         cityRoute.add(JSON.stringify({
-          _id: "abcd",
+          _id: province_id._id,
           label: cityName,
           image: "image"
         }))
