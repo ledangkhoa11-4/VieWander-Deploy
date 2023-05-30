@@ -103,7 +103,7 @@ Router.get("/:id/timeline", async (req, res) => {
             let user = await userModel.findById(post.author_id).exec();
 
             if (user) {
-                let postWithAuthorName = { ...post, name: user.name };
+                let postWithAuthorName = { ...post, name: user.name, avatar: user.avatar };
                 resultUpdated.push(postWithAuthorName);
             }
         }

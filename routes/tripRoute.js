@@ -32,25 +32,35 @@ Router.get("/", async (req, res) => {
       let cityName = city.locations[0].adminArea4
       if (city.locations[0].adminArea1 != "VN")
         continue
-      const province_id = await provinceModel.findOne({name: cityName}).exec()  
       if (!cityRoute.has(JSON.stringify({
-        _id: province_id._id,
+        _id: "temp",
         label: cityName,
         image: "image"
       })))
         cityRoute.add(JSON.stringify({
-          _id: province_id._id,
+          _id: "temp",
           label: cityName,
           image: "image"
         }))
     }
   }
+  cityRoute = await Promise.all(Array.from(cityRoute).map(async (jsonString) =>  {
+    let cityObj = JSON.parse(jsonString)
+    const cityName = cityObj.label
+    const province = await provinceModel.findOne({name: cityName}).exec()  
+    return {
+      _id: province._id,
+      label: cityName,
+      image: "image"
+    }
+  }))
+
   delete route.route.legs
   delete route.route.locations
   delete route.route.options
   delete route.info
-  const parsedArray = Array.from(cityRoute).map(jsonString => JSON.parse(jsonString));
-  route.cityRoute = splitRoute(parsedArray)
+
+  route.cityRoute = splitRoute(cityRoute)
   res.json({
     status: 200,
     message: "OK",
